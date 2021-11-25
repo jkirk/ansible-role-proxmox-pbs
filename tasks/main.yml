@@ -1,0 +1,52 @@
+---
+# Role: proxmox_pbs
+#
+# Usage:
+#
+#   roles:
+#     - proxmox_pbs
+#
+# Implements: https://pbs.proxmox.com/docs/installation.html
+
+- name: External IP must be resolvable in /etc/hosts
+  lineinfile:
+    dest: /etc/hosts
+    regexp: '.*{{ ansible_fqdn }}'
+    line: '{{ ansible_default_ipv4.address }} {{ ansible_fqdn }} {{ ansible_hostname }}'
+
+- name: Add Proxmox Debian repository key (Debian/bullseye)
+  get_url:
+    url: "https://enterprise.proxmox.com/debian/proxmox-release-bullseye.gpg"
+    dest: "/etc/apt/trusted.gpg.d/proxmox-release-bullseye.gpg"
+    checksum: "sha512:7fb03ec8a1675723d2853b84aa4fdb49a46a3bb72b9951361488bfd19b29aab0a789a4f8c7406e71a69aabbc727c936d3549731c4659ffa1a08f44db8fdcebfa"
+  when: ansible_distribution_release == "bullseye"
+
+- name: Make sure pbs-enterprise is removed from apt sources
+  apt_repository:
+    repo: deb https://enterprise.proxmox.com/debian/pbs {{ ansible_distribution_release }} pbs-enterprise
+    state: absent
+    update_cache: false
+
+- name: Enable pbs-no-subscription in apt sources
+  apt_repository:
+    repo: deb http://download.proxmox.com/debian/pbs {{ ansible_distribution_release }} pbs-no-subscription
+    filename: proxmox
+    state: present
+
+- name: Install (minimal) Proxmox Backup Server
+  apt:
+    name:
+      - proxmox-backup-server
+    state: present
+
+- name: Remove /etc/apt/sources.list.d/pbs-enterprise.list (if installed by Proxmox)
+  file:
+    dest: "/etc/apt/sources.list.d/pve-enterprise.list"
+    state: absent
+
+- include_tasks: check_create_pveadmin.yml
+  when: proxmox_pbsadmins is defined
+
+- include_tasks: check_create_pveuser.yml
+  with_items: "{{ proxmox_pveadmins }}"
+  when: proxmox_pbsadmins is defined
