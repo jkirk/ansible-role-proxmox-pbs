@@ -1,6 +1,8 @@
 proxmox_pbs
 ===========
 
+![Lint Code Base](https://github.com/jkirk/ansible-role-base/actions/workflows/superlinter.yml/badge.svg)
+
 Simple ansible role to install Proxmox Backup Server on Debian or Proxmox VE as described in [Proxmox Backup documentation](https://pbs.proxmox.com/docs/installation.html)`
 
 Requirements
