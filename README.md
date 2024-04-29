@@ -73,7 +73,7 @@ For this example we will assume you have defined a host group *proxmox* in the i
 
     - hosts: proxmox
       roles:
-         - { role: proxmox_pbs, pbs_pveadmins: [ 'janedoe', 'johndoe' ] }
+         - { role: proxmox_pbs, proxmox_pbsadmins: [ 'janedoe', 'johndoe' ] }
 ```
 
 To run this playbook you would run `ansible-playbook -i hosts site-proxmox.yml`

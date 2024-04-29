@@ -21,6 +21,13 @@
     checksum: "sha512:7fb03ec8a1675723d2853b84aa4fdb49a46a3bb72b9951361488bfd19b29aab0a789a4f8c7406e71a69aabbc727c936d3549731c4659ffa1a08f44db8fdcebfa"
   when: ansible_distribution_release == "bullseye"
 
+- name: Add Proxmox Debian repository key (Debian/bookworm)
+  get_url:
+    url: "https://enterprise.proxmox.com/debian/proxmox-release-bookworm.gpg"
+    dest: "/etc/apt/trusted.gpg.d/proxmox-release-bookworm.gpg"
+    checksum: "sha512:7da6fe34168adc6e479327ba517796d4702fa2f8b4f0a9833f5ea6e6b48f6507a6da403a274fe201595edc86a84463d50383d07f64bdde2e3658108db7d6dc87"
+  when: ansible_distribution_release == "bookworm"
+
 - name: Make sure pbs-enterprise is removed from apt sources
   apt_repository:
     repo: deb https://enterprise.proxmox.com/debian/pbs {{ ansible_distribution_release }} pbs-enterprise
@@ -41,12 +48,5 @@
 
 - name: Remove /etc/apt/sources.list.d/pbs-enterprise.list (if installed by Proxmox)
   file:
-    dest: "/etc/apt/sources.list.d/pve-enterprise.list"
+    dest: "/etc/apt/sources.list.d/pbs-enterprise.list"
     state: absent
-
-- include_tasks: check_create_pveadmin.yml
-  when: proxmox_pbsadmins is defined
-
-- include_tasks: check_create_pveuser.yml
-  with_items: "{{ proxmox_pveadmins }}"
-  when: proxmox_pbsadmins is defined
