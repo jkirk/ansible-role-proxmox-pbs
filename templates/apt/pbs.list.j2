@@ -1,0 +1,6 @@
+# HEADER: managed by ansible, do NOT edit manually!
+{% if proxmox_pbs_enterprise_repos %}
+deb [signed-by=/usr/share/keyrings/proxmox-archive-keyring.gpg] https://enterprise.proxmox.com/debian/pbs {{ ansible_distribution_release }} pbs-enterprise
+{% else %}
+deb [signed-by=/usr/share/keyrings/proxmox-archive-keyring.gpg] http://download.proxmox.com/debian/pbs {{ ansible_distribution_release }} pbs-no-subscription
+{% endif %}
